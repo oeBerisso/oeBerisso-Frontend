@@ -24,6 +24,7 @@ export default {
   .component {
     min-height: 69vh;
   }
+
   body {
     background-color: #cacaca;
   }
