@@ -23,6 +23,7 @@
                 type="password"
                 placeholder="Contraseña"
                 icon="lock"
+                v-model="user.password"
                 required
                 icon-position="left"
               />
@@ -42,12 +43,33 @@
 
 <script>
 import User from '../../models/user';
+import axios from '../../helper/axios';
 
 export default {
   name: 'login',
   methods: {
-    handleSubmit() {
-      console.log(this.user);
+    handleSubmit: async function register() {
+      this.saving = true;
+      await axios({
+        url: '/auth',
+        method: 'post',
+        data: this.user,
+      }).catch((e) => {
+        if (e.response && e.response.status === 422) {
+          this.$toast.error(e.response.data.msg, {
+            type: 'error',
+            duration: 3000,
+            position: 'top-left',
+          });
+        } else {
+          this.$toast.error('Ocurrio un error en el servidor, intentá ms tarde', {
+            type: 'error',
+            duration: 3000,
+            position: 'top-left',
+          });
+        }
+      });
+      this.saving = false;
     },
   },
   data() {
