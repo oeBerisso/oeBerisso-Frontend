@@ -108,29 +108,39 @@ export default {
   methods: {
     handleSubmit: async function register() {
       this.saving = true;
-      try {
-        await axios({
-          url: '/register',
-          method: 'post',
-          data: this.user,
-        }).then((r) => (console.log(r)));
-      } catch (e) {
-        this.errors = e.response.data.errors;
-      } finally {
-        this.saving = false;
-      }
+      await axios({
+        url: '/register',
+        method: 'post',
+        data: this.user,
+      }).then(() => {
+        this.$toast.success(`Te registraste correctamente, ahora podes iniciar sesion ${this.user.username}`, {
+          type: 'success',
+          duration: 5000,
+          position: 'top-left',
+          onClose: (() => window.location = '/iniciar-sesion'),
+        });
+      }).catch((e) => {
+        if (e.response && e.response.status === 422) {
+          this.errors = e.response.data.errors;
+          this.$toast.error('Hay errores en el formulario', {
+            type: 'error',
+            duration: 3000,
+            position: 'top-left',
+          });
+        } else {
+          this.$toast.error('Ocurrio un error en el servidor, intentá ms tarde', {
+            type: 'error',
+            duration: 3000,
+            position: 'top-left',
+          });
+        }
+      });
+      this.saving = false;
     },
   },
   data() {
     return {
-      errors: {
-        username: [],
-        first_name: [],
-        last_name: [],
-        email: [],
-        password: [],
-        confirm_password: [],
-      },
+      errors: {},
       user: new User(),
       saving: false,
     };
